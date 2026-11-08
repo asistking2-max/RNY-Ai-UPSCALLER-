@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RNYFTBL UPSCALLER AI</title>
+<style>
+:root{--bg:#08090d;--panel:#11131b;--panel2:#171a24;--red:#ff3048;--muted:#9ca3b4;--line:#292d3a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 85% 0%,#291018 0,transparent 32%),var(--bg);color:#f6f7fb;font-family:Inter,system-ui,Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 5%;border-bottom:1px solid var(--line);position:sticky;top:0;background:#090a0fee;backdrop-filter:blur(12px);z-index:2}
+.logo{font-weight:900;letter-spacing:1px}.logo span{color:var(--red)}.badge{font-size:11px;color:#ff9aa6;border:1px solid #71303b;padding:6px 10px;border-radius:30px}
+main{max-width:1100px;margin:38px auto;padding:0 18px}.hero{text-align:center;margin-bottom:28px}.eyebrow{color:var(--red);font-size:12px;font-weight:800;letter-spacing:3px}.hero h1{font-size:clamp(30px,6vw,54px);margin:10px 0}.hero p{color:var(--muted);margin:0}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.card{background:linear-gradient(145deg,#151823,#0f1118);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 15px 45px #0005}
+.card h2{font-size:17px;margin:0 0 16px}.drop{border:1.5px dashed #555b6e;border-radius:14px;padding:32px 14px;text-align:center;background:#0c0e15;cursor:pointer}.drop strong{display:block;margin:10px 0 5px}.drop small{color:var(--muted)}input[type=file]{display:none}
+.btn{border:0;background:var(--red);color:white;font-weight:800;padding:12px 18px;border-radius:10px;cursor:pointer}.btn:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#252a38;border:1px solid #3b4152}.preview{width:100%;max-height:310px;display:none;background:#050609;border-radius:12px;margin-top:14px}
+.fileinfo{color:var(--muted);font-size:12px;margin-top:10px;overflow-wrap:anywhere}
+label{display:flex;justify-content:space-between;font-size:13px;margin:16px 0 8px;color:#dce0ea}select{width:100%;background:#0b0d14;color:white;border:1px solid #353a4b;border-radius:9px;padding:12px}
+input[type=range]{width:100%;accent-color:var(--red)}.value{color:#ff8795}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.check{display:flex;align-items:center;gap:9px;color:#dce0ea;font-size:13px;margin:12px 0}.check input{accent-color:var(--red)}
+.actions{display:flex;gap:10px;margin-top:20px}.actions button{flex:1}.progresswrap{height:9px;background:#282c39;border-radius:20px;overflow:hidden;margin-top:15px}.progress{height:100%;width:0;background:linear-gradient(90deg,#ff3048,#ff8b4a);transition:width .2s}.status{font-size:12px;color:var(--muted);margin-top:8px;min-height:18px}
+.notice{margin-top:18px;padding:12px 14px;border:1px solid #68414a;background:#211219;border-radius:10px;color:#ffb5be;font-size:12px;line-height:1.5}
+footer{text-align:center;color:#73798a;font-size:11px;padding:30px 10px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}header{padding:15px 18px}.card{padding:16px}.hero{margin-top:10px}}
+</style>
+</head>
+<body>
+<header><div class="logo">RNYFTBL <span>UPSCALLER AI</span></div><div class="badge">MOBILE WEB DEMO</div></header>
+<main>
+<section class="hero"><div class="eyebrow">NEXT-GEN VIDEO WORKFLOW</div><h1>Make Every Frame <span style="color:var(--red)">Sharper.</span></h1><p>Upload a clip, choose your enhancement settings, and preview your workflow.</p></section>
+<div class="grid">
+<section class="card">
+<h2>① Import video</h2>
+<label class="drop" for="videoInput"><div style="font-size:30px">⇧</div><strong>Tap to upload your video</strong><small>MP4, MOV or WebM · Local preview only</small><br><br><span class="btn">Choose video</span></label>
+<input id="videoInput" type="file" accept="video/*">
+<video id="preview" class="preview" controls playsinline></video>
+<div id="fileinfo" class="fileinfo">No video selected.</div>
+<div class="notice">Backend-connected prototype: uploads are processed on your server with standard FFmpeg filters. This is not AI upscaling yet; the AI model adapter is the next stage.</div>
+</section>
+<section class="card">
+<h2>② Enhancement settings</h2>
+<div class="row"><div><label for="resolution">Output resolution</label><select id="resolution"><option>Original</option><option>720p</option><option selected>1080p</option><option>2K</option><option>4K</option></select></div><div><label for="fps">Frame rate</label><select id="fps"><option>Keep original</option><option>30 FPS</option><option>60 FPS</option></select></div></div>
+<label>AI detail <span class="value" id="detailVal">65%</span></label><input id="detail" type="range" min="0" max="100" value="65">
+<label>Denoise <span class="value" id="noiseVal">40%</span></label><input id="noise" type="range" min="0" max="100" value="40">
+<label>Sharpen <span class="value" id="sharpVal">55%</span></label><input id="sharp" type="range" min="0" max="100" value="55">
+<label>Color enhancement <span class="value" id="colorVal">35%</span></label><input id="color" type="range" min="0" max="100" value="35">
+<label class="check"><input type="checkbox" id="motion"> Motion enhancement (planned)</label>
+<div class="actions"><button class="btn" id="process" disabled>Start Processing</button><button class="btn secondary" id="reset">Reset</button></div>
+<div class="progresswrap"><div class="progress" id="progress"></div></div><div class="status" id="status">Waiting for a video…</div><a id="download" class="btn" style="display:none;margin-top:12px;text-decoration:none;text-align:center" download>Download enhanced video</a>
+</section>
+</div>
+</main>
+<footer>RNYFTBL UPSCALLER AI · Prototype interface · Built for mobile screens</footer>
+<script>
+const $=id=>document.getElementById(id);
+const sliders=['detail','noise','sharp','color'];
+sliders.forEach(id=>$(id).addEventListener('input',()=>$(id+'Val').textContent=$(id).value+'%'));
+let objectUrl=null, selectedFile=null, activeJob=null, pollHandle=null;
+$('videoInput').addEventListener('change',e=>{
+ const file=e.target.files[0]; if(!file)return;
+ if(objectUrl)URL.revokeObjectURL(objectUrl);
+ selectedFile=file; objectUrl=URL.createObjectURL(file); $('preview').src=objectUrl; $('preview').style.display='block';
+ $('fileinfo').textContent=file.name+' · '+(file.size/1024/1024).toFixed(1)+' MB';
+ $('process').disabled=false; $('download').style.display='none';
+ $('status').textContent='Video ready. Uploads are sent to the configured server only after you press Start Processing.';
+});
+$('reset').addEventListener('click',()=>{
+ sliders.forEach(id=>{$(id).value={detail:65,noise:40,sharp:55,color:35}[id];$(id+'Val').textContent=$(id).value+'%'});
+ $('resolution').value='1080p';$('fps').selectedIndex=0;$('motion').checked=false;
+ $('progress').style.width='0%';$('status').textContent='Settings reset.';$('download').style.display='none';
+});
+$('process').addEventListener('click', async()=>{
+ if(!selectedFile)return;
+ $('process').disabled=true;$('download').style.display='none';$('progress').style.width='0%';
+ $('status').textContent='Uploading video securely to your configured backend…';
+ try{
+  const form=new FormData(); form.append('file',selectedFile);
+  const upload=await fetch('/api/jobs',{method:'POST',body:form});
+  if(!upload.ok)throw new Error(await upload.text());
+  const job=await upload.json();activeJob=job.id;
+  const settings={
+   resolution:$('resolution').value,
+   denoise:Number($('noise').value),
+   sharpen:Number($('sharp').value),
+   detail:Number($('detail').value),
+   color:Number($('color').value),
+   fps:$('fps').value
+  };
+  const start=await fetch('/api/jobs/'+activeJob+'/process',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});
+  if(!start.ok)throw new Error(await start.text());
+  $('status').textContent='Processing on server…';
+  pollHandle=setInterval(checkJob,1500);
+ }catch(err){$('status').textContent='Error: '+err.message;$('process').disabled=false;}
+});
+async function checkJob(){
+ try{
+  const res=await fetch('/api/jobs/'+activeJob);if(!res.ok)throw new Error(await res.text());
+  const job=await res.json();$('progress').style.width=(job.progress||0)+'%';
+  $('status').textContent=job.message||job.status;
+  if(job.status==='completed'){
+   clearInterval(pollHandle);$('download').href='/api/jobs/'+activeJob+'/download';$('download').style.display='inline-block';
+   $('process').disabled=false;
+  }else if(job.status==='failed'){
+   clearInterval(pollHandle);$('process').disabled=false;
+  }
+ }catch(err){clearInterval(pollHandle);$('status').textContent='Status check failed: '+err.message;$('process').disabled=false;}
+}
+</script>
+</body>
+</html>
